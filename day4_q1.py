@@ -1,0 +1,61 @@
+def changeStatus(val, board, markedBoard):
+    for i in range(len(board)):
+        for j in range(len(board[0])):
+            if board[i][j] == str(val): markedBoard[i][j] = True
+
+def checkWinner(board):
+    #check for row of all True's
+    for row in board:
+        for i in range(5):
+            if not(row[i]): break #not a winner, go to next row
+            if(row[i] and i == 4): return True
+
+    #check for col of all True's
+    for i in range(5):
+        for j in range(5):
+            if not(board[j][i]): break #not a winning col, go to next col
+            if board[j][i] and j == 4: return True
+    
+    return False
+
+def sumUnmarked(board, marked):
+    sum = 0
+
+    for i in range(5):
+        for j in range(5):
+            if not marked[i][j]: sum += int(board[i][j])
+    return sum
+
+def bingo(bingoInput, boards):
+    #read in number, change status to marked on every board, check for winner
+    marked = []
+    for i in range(len(boards)):
+        marked.append([[False for i in range(5)] for j in range(5)])
+    
+    for val in bingoInput:
+        for i in range(len(boards)):
+            changeStatus(val, boards[i], marked[i])
+        
+        for i in range(len(boards)):
+            if checkWinner(marked[i]):
+                return int(val) * sumUnmarked(boards[i], marked[i])
+
+f = open("input.txt", "r")
+bingoInput = f.readline().strip() #get rid of newLine
+bingoInput = bingoInput.split(",") #convert to list
+
+boards = []
+curBoard = []
+
+f.readline()
+i = 0
+for x in f:
+    if x != "\n":
+        curBoard.append(x.strip().split())
+        i += 1
+    if(i == 5):
+        i = 0
+        boards.append(curBoard)
+        curBoard = []
+
+print(bingo(bingoInput, boards))
